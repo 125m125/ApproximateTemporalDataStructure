@@ -50,6 +50,10 @@ public abstract class Component<T> {
         return this.weight;
     }
 
+    public void setWeight(final long weight) {
+        this.weight = weight;
+    }
+
     public int getLevel() {
         return this.level;
     }
@@ -67,5 +71,7 @@ public abstract class Component<T> {
     public abstract T getAggregatedValue(final long startTime, final long endTime, final long minY, final long maxY);
 
     public abstract long setFirstChild(Component<T> component);
+
+    public abstract long compress(long compressionAmount);
 
 }

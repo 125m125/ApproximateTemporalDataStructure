@@ -2,8 +2,6 @@ package de._125m125.approximateTemporalDataStructure;
 
 import java.util.Random;
 
-import de._125m125.approximateTemporalDataStructure.ApproximateTemporalDataStructure;
-import de._125m125.approximateTemporalDataStructure.ComponentSettings;
 import de._125m125.approximateTemporalDataStructure.aggregators.AverageAggregator;
 import de._125m125.approximateTemporalDataStructure.aggregators.WeightedValue;
 import de._125m125.approximateTemporalDataStructure.components.ArrayComponent;
@@ -11,26 +9,28 @@ import de._125m125.approximateTemporalDataStructure.components.D2BTreeComponent;
 import de._125m125.approximateTemporalDataStructure.components.factories.SimpleComponentFactory;
 
 public class Example {
-    public static final long HALF_TIME_BOUND = 365l * 24 * 60 * 60 * 1000 * 2;
+    public static final long HALF_TIME_BOUND = 365l * 24 * 60 * 60 * 1000;
 
     public static void main(final String[] args) {
-        long size = 2_000_000;
+        long size = 100_000_000;
         if (args.length > 0) {
             size = Long.parseLong(args[0]);
         }
 
         final ApproximateTemporalDataStructure<WeightedValue<Double>> structure = new ApproximateTemporalDataStructure<>(
                 new ComponentSettings<>(AverageAggregator.getDoubleAverageAggregator(), new SimpleComponentFactory<>()),
-                0l);
+                0l, 7_500_000l);
 
         final Random r = new Random();
         System.out.println("generating data structure of size " + size + "...");
         long start = System.nanoTime();
         for (long i = 0; i < size; i++) {
-            if (i % (size / 100) == 0) {
-                System.out.println(i + "/" + size);
+            if (i % (size / 1000) == 0) {
+                System.out.println(i + "/" + size + " " + structure.getWeight() + " "
+                        + ApproximateTemporalDataStructure.compressed);
+                ApproximateTemporalDataStructure.compressed = false;
             }
-            structure.addEntry(r.nextLong() % Example.HALF_TIME_BOUND + Example.HALF_TIME_BOUND, r.nextInt(320),
+            structure.addEntry(r.nextLong() % Example.HALF_TIME_BOUND + Example.HALF_TIME_BOUND, r.nextInt(80),
                     new WeightedValue<>(r.nextDouble(), 1));
         }
         System.out.println("generated structure in " + (System.nanoTime() - start) / 1_000_000_000 + " seconds");

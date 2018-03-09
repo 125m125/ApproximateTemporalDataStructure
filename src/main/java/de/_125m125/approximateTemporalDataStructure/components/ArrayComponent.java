@@ -134,4 +134,9 @@ public class ArrayComponent<T> extends Component<T> {
         throw new UnsupportedOperationException("ArrayComponents do not have children");
     }
 
+    @Override
+    public long compress(final long compressionAmount) {
+        return 0;
+    }
+
 }

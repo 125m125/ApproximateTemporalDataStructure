@@ -127,7 +127,24 @@ public class D2BTreeComponent<T> extends Component<T> {
 
     @Override
     public long setFirstChild(final Component<T> component) {
+        setWeight(getWeight() + component.getWeight());
         return this.children[0][0].setFirstChild(component);
+    }
+
+    @Override
+    public long compress(final long compressionAmount) {
+        long remaining = compressionAmount;
+        outer: for (int i = 0; i < this.children.length; i++) {
+            for (int j = 0; j < this.children[0].length; j++) {
+                remaining -= this.children[i][j].compress(remaining);
+                if (remaining <= 0) {
+                    break outer;
+                }
+            }
+        }
+        final long compressedWeight = compressionAmount - remaining;
+        setWeight(getWeight() - compressedWeight);
+        return compressedWeight;
     }
 
 }

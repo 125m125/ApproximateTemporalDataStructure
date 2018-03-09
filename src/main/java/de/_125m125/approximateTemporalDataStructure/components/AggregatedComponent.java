@@ -6,7 +6,7 @@ public class AggregatedComponent<T> extends Component<T> {
 
     private T            aggregatedValue;
     private Component<T> component;
-    private boolean      aggregated = false;
+    private boolean      compressed = false;
 
     public AggregatedComponent(final ComponentSettings<T> settings, final long minTime, final long maxTime,
             final long minY, final long maxY, final int level) {
@@ -33,13 +33,13 @@ public class AggregatedComponent<T> extends Component<T> {
 
     public void compress() {
         this.component = null;
-        this.aggregated = true;
+        this.compressed = true;
     }
 
     @Override
     public long innerAddEntry(final long time, final long y, final T value) {
         addValueToAggregation(value);
-        if (this.aggregated) {
+        if (this.compressed) {
             return 0;
         }
         long generatedWeight = 0;
@@ -56,7 +56,7 @@ public class AggregatedComponent<T> extends Component<T> {
 
     @Override
     public T getApproximateValue(final long time, final long y) {
-        if (this.aggregated) {
+        if (this.compressed) {
             throw new UnsupportedOperationException(
                     "approximate values can currently not be requested from aggregated components");
             // final double totalSpaces = getContainedSpaces();
@@ -76,7 +76,7 @@ public class AggregatedComponent<T> extends Component<T> {
             return this.aggregatedValue;
         }
 
-        if (this.aggregated) {
+        if (this.compressed) {
             final long modStartTime = Math.max(startTime, getMinTime());
             final long modEndTime = Math.min(endTime, getMaxTime());
             final long modMinY = Math.max(minY, getMinY());
@@ -99,6 +99,25 @@ public class AggregatedComponent<T> extends Component<T> {
             return 0;
         }
         throw new IllegalArgumentException("AggregatedComponents can only accept components that match their ranges");
+    }
+
+    @Override
+    public long compress(final long compressionAmount) {
+        if (this.component == null) {
+            this.compressed = true;
+            return 0;
+        }
+        final long compressedWeight;
+        if (this.component.getWeight() <= compressionAmount) {
+            this.compressed = true;
+            compressedWeight = this.component.getWeight();
+            this.component = null;
+        } else {
+            compressedWeight = this.component.compress(compressionAmount);
+        }
+
+        setWeight(getWeight() - compressedWeight);
+        return compressedWeight;
     }
 
 }
