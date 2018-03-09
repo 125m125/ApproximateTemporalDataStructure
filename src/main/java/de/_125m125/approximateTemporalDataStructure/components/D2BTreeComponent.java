@@ -11,23 +11,20 @@ public class D2BTreeComponent<T> extends Component<T> {
     @SuppressWarnings("unchecked")
     public D2BTreeComponent(final ComponentSettings<T> settings, final long minTime, final long maxTime,
             final long minY, final long maxY, final int level, final int width, final int height) {
-        super(settings, minTime, maxTime, minY, maxY, level, width * height);
+        super(settings, minTime, maxTime, minY, maxY, level, 1);
 
         final long timeAdd = (maxTime - minTime) / width;
         final long yAdd = (maxY - minY) / height;
         this.children = new AggregatedComponent[width][height];
-        // System.out.println("======");
         long currTime = minTime;
         for (int i = 0; i < width; i++) {
             long currY = minY;
             for (int j = 0; j < height; j++) {
-                this.children[i][j] = new AggregatedComponent<>(settings, currTime, currTime + timeAdd, currY,
-                        currY += yAdd, level - 1);
-                // System.out.print(this.children[i][j].getMinTime() + "->" +
-                // this.children[i][j].getMaxTime() + "|");
+                this.children[i][j] = getSettings().getComponentFactory().generateAggregatedComponent(settings,
+                        currTime, currTime + timeAdd, currY, currY += yAdd, level - 1);
+                setWeight(getWeight() + this.children[i][j].getWeight());
             }
             currTime += timeAdd;
-            // System.out.println();
         }
     }
 

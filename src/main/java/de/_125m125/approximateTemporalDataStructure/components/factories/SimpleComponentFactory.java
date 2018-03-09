@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import de._125m125.approximateTemporalDataStructure.ComponentSettings;
+import de._125m125.approximateTemporalDataStructure.components.AggregatedComponent;
 import de._125m125.approximateTemporalDataStructure.components.ArrayComponent;
 import de._125m125.approximateTemporalDataStructure.components.Component;
 import de._125m125.approximateTemporalDataStructure.components.D2BTreeComponent;
@@ -134,6 +135,12 @@ public class SimpleComponentFactory<T> implements ComponentFactory<T> {
         } else {
             return array[array.length - 1];
         }
+    }
+
+    @Override
+    public AggregatedComponent<T> generateAggregatedComponent(final ComponentSettings<T> settings, final long minTime,
+            final long maxTime, final long minY, final long maxY, final int level) {
+        return new AggregatedComponent<>(settings, minTime, maxTime, minY, maxY, level);
     }
 
 }

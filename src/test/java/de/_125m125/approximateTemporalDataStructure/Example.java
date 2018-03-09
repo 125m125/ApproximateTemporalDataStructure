@@ -12,7 +12,7 @@ public class Example {
     public static final long HALF_TIME_BOUND = 365l * 24 * 60 * 60 * 1000;
 
     public static void main(final String[] args) {
-        long size = 100_000_000;
+        long size = 1_000_000;
         if (args.length > 0) {
             size = Long.parseLong(args[0]);
         }
