@@ -23,7 +23,7 @@ public class ArrayComponent<T> extends Component<T> {
     @Override
     public long innerAddEntry(final long time, final long y, final T value) {
         long generatedWeight = 0;
-        final T current = getApproximateValue(time, y);
+        final T current = getAtIndex(getTimeIndex(time), getYIndex(y));
         if (current != null) {
             set(time, y, getSettings().getAggregator().aggregate(current, value));
         } else {

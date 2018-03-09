@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import de._125m125.approximateTemporalDataStructure.ComponentSettings;
 import de._125m125.approximateTemporalDataStructure.aggregators.SumAggregator;
-import de._125m125.approximateTemporalDataStructure.components.ArrayComponent;
 
 public class ArrayComponentTest {
 
@@ -101,6 +100,27 @@ public class ArrayComponentTest {
         generateGrid();
         assertEquals(3600000d * 136, this.uut.getAggregatedValue(0, 3600000 * 4, 0, 4), 1e-10);
         assertEquals(3600000d * 136, this.uut.getAggregatedValue(-7200000, 3600000 * 10, -2, 10), 1e-10);
+    }
+
+    @Test
+    public void testWeightIncreasesOnNewValue() throws Exception {
+        final long start = this.uut.getWeight();
+
+        final long d = this.uut.addEntry(0l, 0l, 10d);
+
+        assertEquals(start + 1, this.uut.getWeight());
+        assertEquals(1, d);
+    }
+
+    @Test
+    public void testWeightDoesNotIncreaseOnModificationOfValue() throws Exception {
+        this.uut.addEntry(0l, 0l, 10d);
+        final long start = this.uut.getWeight();
+
+        final long d = this.uut.addEntry(1800000l, 0l, 21d);
+
+        assertEquals(start, this.uut.getWeight());
+        assertEquals(0, d);
     }
 
     public void generateGrid() {
