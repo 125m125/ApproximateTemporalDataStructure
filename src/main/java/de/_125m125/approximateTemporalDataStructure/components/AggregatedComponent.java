@@ -65,6 +65,8 @@ public class AggregatedComponent<T> extends Component<T> {
             // totalSpaces);
         } else if (this.component == null) {
             return getSettings().getAggregator().identity();
+        } else if (getSettings().getAggregator().identity().equals(this.aggregatedValue)) {
+            return this.aggregatedValue;
         } else {
             return this.component.getApproximateValue(time, y);
         }
@@ -75,8 +77,9 @@ public class AggregatedComponent<T> extends Component<T> {
         if (startTime <= getMinTime() && endTime >= getMaxTime() && minY <= getMinY() && maxY >= getMaxY()) {
             return this.aggregatedValue;
         }
-
-        if (this.compressed) {
+        if (getSettings().getAggregator().identity().equals(this.aggregatedValue)) {
+            return this.aggregatedValue;
+        } else if (this.compressed) {
             final long modStartTime = Math.max(startTime, getMinTime());
             final long modEndTime = Math.min(endTime, getMaxTime());
             final long modMinY = Math.max(minY, getMinY());
