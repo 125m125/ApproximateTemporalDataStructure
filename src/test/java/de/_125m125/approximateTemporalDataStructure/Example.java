@@ -17,15 +17,15 @@ public class Example {
             size = Long.parseLong(args[0]);
         }
 
+        final SimpleComponentFactory<WeightedValue<Double>> factory = new SimpleComponentFactory<>();
         final ApproximateTemporalDataStructure<WeightedValue<Double>> structure = new ApproximateTemporalDataStructure<>(
-                new ComponentSettings<>(AverageAggregator.getDoubleAverageAggregator(), new SimpleComponentFactory<>()),
-                0l, 7_500_000l);
+                new ComponentSettings<>(AverageAggregator.getDoubleAverageAggregator(), factory), 0l, 7_500_000l);
 
         final Random r = new Random();
         System.out.println("generating data structure of size " + size + "...");
         long start = System.nanoTime();
         for (long i = 0; i < size; i++) {
-            if (i % (size / 1000) == 0) {
+            if (i % (size / 100) == 0) {
                 System.out.println(i + "/" + size + " " + structure.getWeight() + " "
                         + ApproximateTemporalDataStructure.compressed);
                 ApproximateTemporalDataStructure.compressed = false;
@@ -60,5 +60,11 @@ public class Example {
                 "get without aggregation-bounds took " + (System.nanoTime() - start) / 1_000_000_000.0 + " seconds");
         System.out.println("times an arraycomponent was touched: " + ArrayComponent.touchCount);
         System.out.println("lowest accessed D2BTreeComponent: " + D2BTreeComponent.lowestLevel);
+
+        final SelectionWindow[][] recommendedSelectionWindows = factory.getRecommendedSelectionWindows(0,
+                1000 * 86399999l, 0, 160, 0, 1000, 1);
+        System.out.println("first recommended selection window: " + recommendedSelectionWindows[0][0]);
+        System.out.println("recommended window divisions: " + recommendedSelectionWindows.length + ":"
+                + recommendedSelectionWindows[0].length);
     }
 }

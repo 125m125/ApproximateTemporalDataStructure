@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import de._125m125.approximateTemporalDataStructure.ComponentSettings;
+import de._125m125.approximateTemporalDataStructure.SelectionWindow;
 import de._125m125.approximateTemporalDataStructure.components.AggregatedComponent;
 import de._125m125.approximateTemporalDataStructure.components.ArrayComponent;
 import de._125m125.approximateTemporalDataStructure.components.Component;
@@ -141,6 +142,50 @@ public class SimpleComponentFactory<T> implements ComponentFactory<T> {
     public AggregatedComponent<T> generateAggregatedComponent(final ComponentSettings<T> settings, final long minTime,
             final long maxTime, final long minY, final long maxY, final int level) {
         return new AggregatedComponent<>(settings, minTime, maxTime, minY, maxY, level);
+    }
+
+    @Override
+    public SelectionWindow[][] getRecommendedSelectionWindows(final long minTime, final long maxTime, final long minY,
+            final long maxY, final long realStartTime, final int timeCount, final int yCount) {
+        final double timeStepSize = (maxTime - minTime) / timeCount;
+        final double yStepSize = (maxY - minY) / yCount;
+        final long recTimeStepSize = getRecommendedIntervalSize(0, timeStepSize);
+        final long recYStepSize = getRecommendedIntervalSize(1, yStepSize);
+
+        final long recTimeStart = (minTime - realStartTime) - (minTime - realStartTime) % recTimeStepSize;
+        final long recYStart = minY - minY % recYStepSize;
+
+        final SelectionWindow[][] result = new SelectionWindow[(int) Math
+                .ceil((maxTime - recTimeStart) / (double) recTimeStepSize)][(int) Math
+                        .ceil((maxY - recYStart) / (double) recYStepSize)];
+        int i, j;
+        long t, y;
+        for (t = recTimeStart, i = 0; t < maxTime; t += recTimeStepSize, i++) {
+            for (y = recYStart, j = 0; y < maxY; j++) {
+                result[i][j] = new SelectionWindow(t, t + recTimeStepSize, y, y += recYStepSize);
+            }
+
+        }
+        return result;
+    }
+
+    private long getRecommendedIntervalSize(final int index, final double stepsize) {
+        long recStepSize = (long) Math.ceil(stepsize);
+        if (recStepSize > this.componentSizes.get(this.componentSizes.size() - 1)[index]) {
+            return recStepSize;
+        }
+        recStepSize = 1;
+        double offset = Math.abs(Math.round(stepsize - 1));
+        System.out.println(offset);
+        for (int i = 0; i < this.componentSizes.size(); i++) {
+            final long cSize = this.componentSizes.get(i)[index];
+            final long cOffset = Math.abs(Math.round(stepsize - cSize));
+            if (cOffset < offset) {
+                recStepSize = cSize;
+                offset = cOffset;
+            }
+        }
+        return recStepSize;
     }
 
 }

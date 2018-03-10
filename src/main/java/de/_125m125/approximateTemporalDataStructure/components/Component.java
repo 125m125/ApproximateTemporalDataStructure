@@ -1,6 +1,7 @@
 package de._125m125.approximateTemporalDataStructure.components;
 
 import de._125m125.approximateTemporalDataStructure.ComponentSettings;
+import de._125m125.approximateTemporalDataStructure.SelectionWindow;
 
 public abstract class Component<T> {
     private final ComponentSettings<T> settings;
@@ -62,6 +63,10 @@ public abstract class Component<T> {
         final long generatedWeight = innerAddEntry(time, y, value);
         this.weight += generatedWeight;
         return generatedWeight;
+    }
+
+    public T getAggregatedValue(final SelectionWindow window) {
+        return getAggregatedValue(window.getStartTime(), window.getEndTime(), window.getMinY(), window.getMaxY());
     }
 
     protected abstract long innerAddEntry(final long time, final long y, final T value);
