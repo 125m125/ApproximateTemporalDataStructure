@@ -2,6 +2,7 @@ package de._125m125.approximateTemporalDataStructure.components;
 
 import de._125m125.approximateTemporalDataStructure.ComponentSettings;
 import de._125m125.approximateTemporalDataStructure.aggregators.Aggregator;
+import de._125m125.approximateTemporalDataStructure.events.ValueModificationEvent;
 
 public class ArrayComponent<T> extends Component<T> {
     public static int        touchCount = 0;
@@ -30,6 +31,7 @@ public class ArrayComponent<T> extends Component<T> {
             set(time, y, value);
             generatedWeight = 1;
         }
+        getSettings().onValueModification(new ValueModificationEvent<>(value, getTimeIndex(time), getYIndex(y), this));
         return generatedWeight;
     }
 

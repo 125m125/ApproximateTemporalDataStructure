@@ -1,6 +1,9 @@
 package de._125m125.approximateTemporalDataStructure.components;
 
 import de._125m125.approximateTemporalDataStructure.ComponentSettings;
+import de._125m125.approximateTemporalDataStructure.events.ComponentCompressionEvent;
+import de._125m125.approximateTemporalDataStructure.events.ComponentCreationEvent;
+import de._125m125.approximateTemporalDataStructure.events.ValueModificationEvent;
 
 public class AggregatedComponent<T> extends Component<T> {
 
@@ -25,6 +28,7 @@ public class AggregatedComponent<T> extends Component<T> {
 
     public void addValueToAggregation(final T newValue) {
         setAggregatedValue(getSettings().getAggregator().aggregate(this.aggregatedValue, newValue));
+        getSettings().onValueModification(new ValueModificationEvent<>(newValue, 0, 0, this));
     }
 
     public Component<T> getComponent() {
@@ -32,6 +36,7 @@ public class AggregatedComponent<T> extends Component<T> {
     }
 
     public void compress() {
+        getSettings().onComponentCompression(new ComponentCompressionEvent<>(this.component));
         this.component = null;
         this.compressed = true;
     }
@@ -52,6 +57,7 @@ public class AggregatedComponent<T> extends Component<T> {
 
     private void generateComponent() {
         this.component = getSettings().getComponentFactory().generateComponent(getLevel(), this);
+        getSettings().onComponentCreation(new ComponentCreationEvent<>(this.component, this, 0, 0));
     }
 
     @Override

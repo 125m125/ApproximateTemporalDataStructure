@@ -1,6 +1,7 @@
 package de._125m125.approximateTemporalDataStructure.components;
 
 import de._125m125.approximateTemporalDataStructure.ComponentSettings;
+import de._125m125.approximateTemporalDataStructure.events.ComponentCreationEvent;
 
 public class D2BTreeComponent<T> extends Component<T> {
 
@@ -23,6 +24,7 @@ public class D2BTreeComponent<T> extends Component<T> {
                 this.children[i][j] = getSettings().getComponentFactory().generateAggregatedComponent(settings,
                         currTime, currTime + timeAdd, currY, currY += yAdd, level - 1);
                 setWeight(getWeight() + this.children[i][j].getWeight());
+                getSettings().onComponentCreation(new ComponentCreationEvent<>(this.children[i][j], this, i, j));
             }
             currTime += timeAdd;
         }
